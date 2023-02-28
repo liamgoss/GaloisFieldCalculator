@@ -5,6 +5,7 @@
 #include "boost/dynamic_bitset.hpp"
 #include <algorithm>
 #include <iterator>
+#include <string>
 using namespace std;
 
 /*
@@ -35,7 +36,7 @@ class fieldElement {
         // The following functions are overloads of the +,-,*,/ operators such that they 
         // are performed according to their respective polynomial operations over the finite field
         
-        // Addition and subtraction in a finite field of GaloisField(2^m) are identical to bitwise XOR of the binary representations of the polynomials
+        // Addition and subtraction in a binary extension field are identical to the bitwise XOR of the binary representations of the polynomials
         boost::dynamic_bitset <uint32_t> operator + (fieldElement const &input) { 
             cout << input.value << "+" << value << "=" << (input.value ^ value) << endl;
             return input.value ^ value;
@@ -46,10 +47,12 @@ class fieldElement {
         }
 
         boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {     
+            // TODO: Implement multiplication
             return input.value;
         }
 
         boost::dynamic_bitset <uint32_t> operator / (fieldElement const &input) {
+            // TODO: Implement division
             return input.value;
         }
 
@@ -76,7 +79,7 @@ class GaloisField {
 
 private: 
     int degree = 4; // m where GaloisField(2^m)
-    int elementBitSize = ceil(log2(degree) + 1); // number of bits needed to represent the polynomial elements
+    int elementBitSize = degree; // number of bits needed to represent the polynomial elements
     int polynomialVal = 19; // Defaults to defining polynomial of x^4+x+1 (10011)
     vector<fieldElement> elements; // vector to hold field elements
     
@@ -88,19 +91,34 @@ private:
         }
     }
 
-    
-
 public:
+
+    int getDegree() {
+        return degree;
+    }
+    int getElementBitSize() {
+        return elementBitSize;
+    }
+    int getPolynomialVal() {
+        return polynomialVal;
+    }
+
+    vector<fieldElement> getElements() {
+        return elements;
+    }
+
+
     // Overload the [] operator so that you can do GaloisField[0] to get the 0th fieldElement object
     fieldElement& operator[] (int index) {
         return elements[index];
     }
 
     void binaryToPolynomial(boost::dynamic_bitset <uint32_t> bits) {
+        string lineOut = "";
         if (bits == boost::dynamic_bitset <uint32_t>(elementBitSize, 0)) {
-            cout << "0" << endl; // If the bits are zero, print 0
+            cout << "0" << endl;
         } else {
-            // TODO: Fix this
+            // TODO: Fix remove trailing +
             for (int i=bits.size()-1; i>=0; i--) {
                 if (bits[i] == 1) {
                     if (i == 0) {
@@ -115,12 +133,18 @@ public:
                     }
                 }
                 
-            
             }
             cout << endl;
+            
         }
-        
     }
+
+    void printFieldValues() {
+        for (int i=0; i<elements.size(); i++) {
+            cout << elements[i].getValue() << endl;
+        }
+    }
+
     /**
      * Galois Field Class Constructor
      *
@@ -150,14 +174,18 @@ public:
 
 
 int main() {
-    
-    int m = 4; // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011
+    // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
+    int m = 4; // input m for degree of field GaloisField(2^m)
     int definingPolynomial = 19;
-    GaloisField field(m, definingPolynomial); // input m for degree of field GaloisField(2^m)
+    GaloisField field(m, definingPolynomial); 
 
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
     }
+
+    // cout << field.getDegree() << endl;
+    // cout << field.getElementBitSize() << endl;
+    // field.printFieldValues();
 
 
     return 0;
