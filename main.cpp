@@ -118,24 +118,32 @@ public:
         if (bits == boost::dynamic_bitset <uint32_t>(elementBitSize, 0)) {
             cout << "0" << endl;
         } else {
-            // TODO: Fix remove trailing +
             for (int i=bits.size()-1; i>=0; i--) {
                 if (bits[i] == 1) {
                     if (i == 0) {
-                        cout << "1"; // Anything to the 0th power is 1
+                        lineOut = lineOut + "1";
+                        //cout << "1"; // Anything to the 0th power is 1
                     } else if (i == 1) {
-                        cout << "x";
+                        lineOut = lineOut + "x";
+                        //cout << "x";
                     } else {
-                        cout << "x^" << i;
+                        lineOut = lineOut + "x^" + to_string(i);
+                        //cout << "x^" << i;
                     }
-                    if (i > 0) {
-                        cout << " + ";
+                if (i > 0) {
+                        lineOut = lineOut + " + ";
+                        //cout << " + ";
                     }
                 }
-                
             }
-            cout << endl;
+            // This part right here removes the trailing plus sign at the end of some lines
+            if (lineOut[lineOut.size()-2] == '+') {
+                cout << lineOut.substr(0,lineOut.size()-3);
+            } else {
+                cout << lineOut;
+            }
             
+            cout << endl;   
         }
     }
 
