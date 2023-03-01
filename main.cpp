@@ -17,6 +17,7 @@ class fieldElement {
     private:
         int bitwidth = 4;
         boost::dynamic_bitset <uint32_t> value;// = boost::dynamic_bitset <uint32_t> (bitwidth, 0);
+        boost::dynamic_bitset <uint32_t> definingPolynomial;
     public:
 
         boost::dynamic_bitset <uint32_t> getValue () {
@@ -47,8 +48,22 @@ class fieldElement {
         }
 
         boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {     
-            // TODO: Implement multiplication
-            return input.value;
+            boost::dynamic_bitset <uint32_t> product(bitwidth, 0);
+            for (int i =0; i < bitwidth; i++) {
+                if (value[i]) {
+                    product ^= (input.value << i);
+                }
+            }
+            // Perform modulo reduction via irreducible polynomial
+            while (product.to_ulong() >= bitwidth) {
+                boost::dynamic_bitset<uint32_t> tmp (bitwidth, product.to_ulong());
+                tmp >>= bitwidth - 5; // Shift to the left most bit of irreducible polynomial highest order
+                tmp ^= definingPolynomial;
+                tmp <<= bitwidth -5;
+                product ^= tmp;
+                cout << "current product = " << product << endl;
+            }
+            return product;
         }
 
         boost::dynamic_bitset <uint32_t> operator / (fieldElement const &input) {
@@ -56,8 +71,15 @@ class fieldElement {
             return input.value;
         }
 
+        fieldElement(int width, int val, int poly) {
+            // The preferred constructor; specifies both bitwidth and value of the element, and the defining polynomial of the field
+            bitwidth = width;
+            value = boost::dynamic_bitset <uint32_t> (bitwidth, val);
+            definingPolynomial = boost::dynamic_bitset <uint32_t> (bitwidth, poly);
+        }
+
         fieldElement(int width, int val) {
-            // The preferred constructor; specifies both bitwidth and value of the element
+            // Specifies both bitwidth and value of the element
             bitwidth = width;
             value = boost::dynamic_bitset <uint32_t> (bitwidth, val);
         }
@@ -86,7 +108,7 @@ private:
     // Create 2^(fieldSize) many binary representations of the polynomials
     void defineFieldValues() {
         for (int i=0; i<pow(2, elementBitSize); i++) {
-            fieldElement element_i(elementBitSize, i);
+            fieldElement element_i(elementBitSize, i, polynomialVal);
             elements.push_back(element_i);
         }
     }
@@ -121,8 +143,10 @@ public:
         for (int i=0; i<polynomial.size(); i++) {
             if (polynomial[i] == 'x') {
                 xIndices.push_back(i);
+                cout << i;
             }
         }
+        cout << endl;
         for (auto it: xIndices) {
             vector<char> blacklist = {'+', '-', '*', '/', ' '};
             if (it == 0) {
@@ -234,7 +258,13 @@ int main() {
     GaloisField field(m, definingPolynomial); 
 
 
-    field.polynomialStringToInt("x^2+2x+1");
+    //field.polynomialStringToInt("x^2+2x+1");
+
+    fieldElement element2 = field[2];
+    fieldElement element3 = field[3];
+    //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
+
+    cout << element2.getValue() << "*" << element3.getValue() << "="  << element2 * element3;
     /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
