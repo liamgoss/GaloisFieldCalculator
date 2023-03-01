@@ -91,7 +91,50 @@ private:
         }
     }
 
+    
+
 public:
+    // Move to private after testing
+    int polynomialStringToInt(string polynomial) {
+        /*
+            1. find all "x^"
+                a) also find just "x" without a "^", this is x^1s
+            2. find all chars on the left side of "x^"
+                *) This will be the coefficent of the term
+                *) Make sure it isn't an operator or whitespace or outside the bounds
+            3. find all chars on the right side of "x^"
+                *) This will be the power for each term
+            4. Mod 2 all coefficients (to keep it in binary extension field {0, 1})
+            5. Mod p(x) polynomial to keep it in range
+            6. Convert to binary representation (outside of this function or change the return type)
+        */
+
+        
+        // Get index of every x
+        vector<int> xIndices;
+        vector<int> xCoefficients;
+        vector<int> xPowers;
+        cout << "x at ";
+        for (int i=0; i<polynomial.size(); i++) {
+            if (polynomial[i] == 'x') {
+                xIndices.push_back(i);
+            }
+        }
+        for (auto it: xIndices) {
+            vector<char> blacklist = {'+', '-', '*', '/', ' '};
+            if (it == 0) {
+                // No leading coefficient on first term
+                xCoefficients.push_back(0);
+            } else {
+                if (find(blacklist.begin(), blacklist.end(), polynomial[it-1]) != blacklist.end()) {
+                    // If the char before x is not a number, its not a coefficient
+
+                    // Not sure if this is the most efficient way to do this, I'm open to scrapping this function entirely
+                }
+            }
+        }
+        return 0;
+    }
 
     int getDegree() {
         return degree;
@@ -187,9 +230,13 @@ int main() {
     int definingPolynomial = 19;
     GaloisField field(m, definingPolynomial); 
 
+
+    field.polynomialStringToInt("x^2+2x+1");
+    /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
     }
+    */
 
     // cout << field.getDegree() << endl;
     // cout << field.getElementBitSize() << endl;
