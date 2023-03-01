@@ -48,25 +48,26 @@ class fieldElement {
         }
 
         boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {     
+            
             boost::dynamic_bitset <uint32_t> product(bitwidth, 0);
             for (int i =0; i < bitwidth; i++) {
                 if (value[i]) {
                     product ^= (input.value << i);
                 }
             }
-            // Perform modulo reduction via irreducible polynomial
-            while (product.to_ulong() >= bitwidth) {
-                boost::dynamic_bitset<uint32_t> tmp (bitwidth, product.to_ulong());
-                tmp >>= bitwidth - 5; // Shift to the left most bit of irreducible polynomial highest order
-                tmp ^= definingPolynomial;
-                tmp <<= bitwidth -5;
-                product ^= tmp;
-                
-                if (product.to_ulong() <= pow(2, bitwidth)) {
-                    break;
+
+            boost::dynamic_bitset <uint32_t> mod_poly (bitwidth, 1);
+            mod_poly <<= bitwidth;
+            mod_poly |= definingPolynomial;
+
+            boost::dynamic_bitset <uint32_t> divisor(bitwidth+1, 0);
+
+            for (int i=bitwidth; i>=bitwidth; i--) {
+                if (product[i]) {
+                    divisor = mod_poly << (i - bitwidth);
+                    product ^= divisor;
                 }
             }
-            //cout << "Product: " << product << endl;
             return product;
         }
 
@@ -266,8 +267,8 @@ int main() {
 
     //field.polynomialStringToInt("x^2+2x+1");
 
-    fieldElement element2 = field[4]; // x^2
-    fieldElement element5 = field[5]; // x^2 + 1
+    fieldElement element2 = field[4]; // x
+    fieldElement element5 = field[5]; // x^2+1
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
     cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
