@@ -61,8 +61,12 @@ class fieldElement {
                 tmp ^= definingPolynomial;
                 tmp <<= bitwidth -5;
                 product ^= tmp;
-                cout << "current product = " << product << endl;
+                
+                if (product.to_ulong() <= pow(2, bitwidth)) {
+                    break;
+                }
             }
+            //cout << "Product: " << product << endl;
             return product;
         }
 
@@ -253,18 +257,21 @@ public:
 
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
-    int m = 4; // input m for degree of field GaloisField(2^m)
-    int definingPolynomial = 19;
+    int m = 3; // input m for degree of field GaloisField(2^m)
+    //int definingPolynomial = 19;
+    int definingPolynomial = 13; // x^3+x^2+1
+                                 // 1101 = 13
     GaloisField field(m, definingPolynomial); 
 
 
     //field.polynomialStringToInt("x^2+2x+1");
 
-    fieldElement element2 = field[2];
-    fieldElement element3 = field[3];
+    fieldElement element2 = field[4]; // x^2
+    fieldElement element5 = field[5]; // x^2 + 1
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
-    cout << element2.getValue() << "*" << element3.getValue() << "="  << element2 * element3;
+    cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
+    
     /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
