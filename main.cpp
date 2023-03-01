@@ -96,6 +96,9 @@ private:
 public:
     // Move to private after testing
     int polynomialStringToInt(string polynomial) {
+
+        // Note: Can possibly copy or modify the code at the bottom of this page: https://cplusplus.com/forum/general/118352/
+
         /*
             1. find all "x^"
                 a) also find just "x" without a "^", this is x^1s
