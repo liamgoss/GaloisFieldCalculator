@@ -20,6 +20,31 @@ class fieldElement {
         boost::dynamic_bitset <uint32_t> definingPolynomial;
     public:
 
+        vector<int> extendedEuclideanAlgo(int a, int b) {
+            // a*s + b*t = gcd(a,b)
+            int s0 = 1, t0 = 0, s1 = 0, t1 = 1;
+            int q, r;
+
+            while (b != 0) {
+                q = a / b;
+                r = a % b;
+
+                a = b;
+                b = r;
+
+                int temp_s = s0 - q * s1;
+                s0 = s1;
+                s1 = temp_s;
+
+                int temp_t = t0 - q * t1;
+                t0 = t1;
+                t1 = temp_t;
+            }
+            // gcd is a
+            vector<int> returnVals = {s0, t0};
+            return returnVals;
+        }
+
         boost::dynamic_bitset <uint32_t> getValue () {
             return value;
         }
@@ -72,7 +97,6 @@ class fieldElement {
         }
 
         boost::dynamic_bitset <uint32_t> operator / (fieldElement const &input) {
-            // TODO: Implement division
             return input.value;
         }
 
@@ -271,7 +295,8 @@ int main() {
     fieldElement element5 = field[5]; // x^2+1
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
-    cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
+    //cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
+    
     
     /*
     for (int i=0; i<pow(2, m); i++){
