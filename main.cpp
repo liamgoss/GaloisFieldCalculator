@@ -59,43 +59,35 @@ class fieldElement {
         }
 
 
-        // The following functions are overloads of the +,-,*,/ operators such that they 
+        // The following functions are overloads of the +,-,*,/ operators such that they
         // are performed according to their respective polynomial operations over the finite field
-        
+
         // Addition and subtraction in a binary extension field are identical to the bitwise XOR of the binary representations of the polynomials
-        boost::dynamic_bitset <uint32_t> operator + (fieldElement const &input) { 
+        boost::dynamic_bitset <uint32_t> operator + (fieldElement const &input) {
             cout << input.value << "+" << value << "=" << (input.value ^ value) << endl;
             return input.value ^ value;
         }
-        boost::dynamic_bitset <uint32_t> operator - (fieldElement const &input) { 
+        boost::dynamic_bitset <uint32_t> operator - (fieldElement const &input) {
             cout << input.value << "+" << value << "=" << (input.value ^ value) << endl;
             return input.value ^ value;
         }
 
-        boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {     
-            
+        //Multiplication Operator that is currently working
+        boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {
+
             boost::dynamic_bitset <uint32_t> product(bitwidth, 0);
             for (int i =0; i < bitwidth; i++) {
-                if (value[i]) {
-                    product ^= (input.value << i);
-                }
-            }
-
-            boost::dynamic_bitset <uint32_t> mod_poly (bitwidth, 1);
-            mod_poly <<= bitwidth;
-            mod_poly |= definingPolynomial;
-
-            boost::dynamic_bitset <uint32_t> divisor(bitwidth+1, 0);
-
-            for (int i=bitwidth; i>=bitwidth; i--) {
-                if (product[i]) {
-                    divisor = mod_poly << (i - bitwidth);
-                    product ^= divisor;
+                if (input.value[i]) {
+                    if(value[bitwidth-i] == 1)
+                        product = (value << i) ^ definingPolynomial ^ product;
+                    else
+                        product = (value << i) ^ product;
                 }
             }
             return product;
         }
 
+        //Division Operator NOT WORKING
         boost::dynamic_bitset <uint32_t> operator / (fieldElement const &input) {
             return input.value;
         }
@@ -128,12 +120,12 @@ class fieldElement {
 
 class GaloisField {
 
-private: 
+private:
     int degree = 4; // m where GaloisField(2^m)
     int elementBitSize = degree; // number of bits needed to represent the polynomial elements
     int polynomialVal = 19; // Defaults to defining polynomial of x^4+x+1 (10011)
     vector<fieldElement> elements; // vector to hold field elements
-    
+
     // Create 2^(fieldSize) many binary representations of the polynomials
     void defineFieldValues() {
         for (int i=0; i<pow(2, elementBitSize); i++) {
@@ -142,7 +134,7 @@ private:
         }
     }
 
-    
+
 
 public:
     // Move to private after testing
@@ -163,7 +155,7 @@ public:
             6. Convert to binary representation (outside of this function or change the return type)
         */
 
-        
+
         // Get index of every x
         vector<int> xIndices;
         vector<int> xCoefficients;
@@ -194,6 +186,9 @@ public:
 
     int getDegree() {
         return degree;
+    }
+    void setDegree(int m){
+        degree = m;
     }
     int getElementBitSize() {
         return elementBitSize;
@@ -241,8 +236,8 @@ public:
             } else {
                 cout << lineOut;
             }
-            
-            cout << endl;   
+
+            cout << endl;
         }
     }
 
@@ -257,13 +252,13 @@ public:
      *
      * Define the Galois Field of a base of 2 with a degree m (i.e. GaloisField(2^m))
      *
-     * @param m Degree of the polynomial of base 2 
+     * @param m Degree of the polynomial of base 2
      * @param poly Custom irreducible polynomial represented in decimal (i.e. 13 for x^3+2+1 [1101 which is 13])
      */
     GaloisField (int m, int poly) {
         // If custom polynomial is desired, this constructor will be executed
-        degree = m;
-        polynomialVal = poly;   
+        setDegree(m);
+        polynomialVal = poly;
         defineFieldValues();
     }
 
@@ -284,20 +279,19 @@ int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
     int m = 3; // input m for degree of field GaloisField(2^m)
     //int definingPolynomial = 19;
-    int definingPolynomial = 13; // x^3+x^2+1
-                                 // 1101 = 13
-    GaloisField field(m, definingPolynomial); 
+    int definingPolynomial = 19; // x^4+x+1
+                                 // 10011 = 19
+    GaloisField field(m, definingPolynomial);
 
 
     //field.polynomialStringToInt("x^2+2x+1");
 
-    fieldElement element2 = field[4]; // x
-    fieldElement element5 = field[5]; // x^2+1
+    fieldElement element2 = field[4]; // x^2
+    fieldElement element5 = field[2]; // x
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
-    //cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
-    
-    
+    cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
+
     /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
