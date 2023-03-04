@@ -125,9 +125,23 @@ class fieldElement {
             return product;
         }
 
-        //Division Operator NOT WORKING
+        //Division Operator NOT OPTIMIZED
         boost::dynamic_bitset <uint32_t> operator / (fieldElement const &input) {
-            return input.value;
+            int inverses[] = {0,1,9,14,13,11,7,6,15,2,12,5,10,4,3,8};
+            int intval;
+            intval = (int) input.value.to_ulong();
+            boost::dynamic_bitset <uint32_t> temp(bitwidth, inverses[intval]);
+            boost::dynamic_bitset <uint32_t> quotient(bitwidth, 0);
+            for (int i =0; i < bitwidth; i++) {
+                if (value[i])
+                    quotient = quotient ^ temp;
+                if(temp[bitwidth-1] == 1)
+                    temp = (temp << 1) ^ definingPolynomial;
+                else
+                    temp = (temp << 1);
+            }
+            cout << value << "/" << input.value << "=" << quotient << endl;
+            return quotient;
         }
 
         fieldElement(int width, int val, int poly) {
@@ -346,10 +360,10 @@ int main() {
             elementa + elementb;
         else if(op == '-')
             elementa - elementb;
+        else if(op == '/')
+            elementa / elementb;
         else if(op == '*')
             elementa * elementb;
-        //else(op == '/')
-            //elementa / elementb;
         cout << "Compute another? :";
         cin >> cont;
         cin.ignore(256,'\n');
