@@ -334,6 +334,7 @@ public:
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
     int m; // input m for degree of field GaloisField(2^m)
+    int maxin;  //holds value of maximum input value for given field
     int definingPolynomial; //input polynomial
     int a,b;  //variables for field elements
     char cont = 'y'; //variable to continue
@@ -343,12 +344,21 @@ int main() {
     cout << "Enter the value of the given defining polynomial for GF(2^" << m << "):";
     cin >> definingPolynomial;
     GaloisField field(m, definingPolynomial);
+    maxin = (1 << m);
     while(cont == 'y' || cont == 'Y'){
         cout << "Enter the first element of the field:";
-        cin >> a;
+        while(!(cin >> a) || a >= maxin){
+            cout << "Not a valid element of the field.\nEnter the first element of the field:";
+            cin.clear();
+            cin.ignore(256,'\n');
+        }
         cout << "Enter the second element of the field:";
-        cin >> b;
-        fieldElement elementa = field[a];
+        while(!(cin >> b) || b >= maxin){
+            cout << "Not a valid element of the field.\nEnter the first element of the field:";
+            cin.clear();
+            cin.ignore(256,'\n');
+        }
+        fieldElement elementa = field[a]; //create desired elements within the feild
         fieldElement elementb = field[b];
         cout << "Enter the operation to perform (+,-,*,/):";
         cin >> op;
