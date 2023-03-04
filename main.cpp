@@ -21,7 +21,7 @@ class fieldElement {
     public:
 
         boost::dynamic_bitset <uint32_t> extendedEuclideanAlgo() {
-            
+
 
         }
 
@@ -56,13 +56,14 @@ class fieldElement {
         boost::dynamic_bitset <uint32_t> operator * (fieldElement const &input) {
 
             boost::dynamic_bitset <uint32_t> product(bitwidth, 0);
+            boost::dynamic_bitset <uint32_t> temp = value;
             for (int i =0; i < bitwidth; i++) {
-                if (input.value[i]) {
-                    if(value[bitwidth-i] == 1)
-                        product = (value << i) ^ definingPolynomial ^ product;
-                    else
-                        product = (value << i) ^ product;
-                }
+                if (input.value[i])
+                    product = product ^ temp;
+                if(temp[bitwidth-1] == 1)
+                    temp = (temp << 1) ^ definingPolynomial;
+                else
+                    temp = (temp << 1);
             }
             return product;
         }
@@ -261,22 +262,21 @@ public:
 
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
-    int m = 3; // input m for degree of field GaloisField(2^m)
+    int m = 4; // input m for degree of field GaloisField(2^m)
     //int definingPolynomial = 19;
-    int definingPolynomial = 13; // x^4+x+1
+    int definingPolynomial = 19; // x^4+x+1
                                  // 10011 = 19
     GaloisField field(m, definingPolynomial);
-    
+
 
 
     //field.polynomialStringToInt("x^2+2x+1");
 
-    fieldElement element2 = field[4]; // x^2
-    fieldElement element5 = field[2]; // x
+    fieldElement element2 = field[11]; // x^2
+    fieldElement element5 = field[4]; // x
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
     cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
-
     /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
