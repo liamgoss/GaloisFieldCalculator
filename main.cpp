@@ -104,7 +104,7 @@ class fieldElement {
             return input.value ^ value;
         }
         boost::dynamic_bitset <uint32_t> operator - (fieldElement const &input) {
-            cout << input.value << "+" << value << "=" << (input.value ^ value) << endl;
+            cout << input.value << "-" << value << "=" << (input.value ^ value) << endl;
             return input.value ^ value;
         }
 
