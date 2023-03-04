@@ -13,6 +13,8 @@ Write a simple four-function calculator (+, -, *, /) in GaloisField (2^4) using 
 for the multiplicative inverses. You may represent elements using binary string format (that is, x^3+1 would be 1001).
 */
 
+
+
 class fieldElement {
     private:
         int bitwidth = 4;
@@ -20,7 +22,61 @@ class fieldElement {
         boost::dynamic_bitset <uint32_t> definingPolynomial;
     public:
 
-        boost::dynamic_bitset <uint32_t> extendedEuclideanAlgo() {
+        int getTrailingZeros(boost::dynamic_bitset <uint32_t> bits) {
+            int count = 0;
+            for (int i=0; i<bits.size(); i++) {
+                if (bits[i] == 0) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            return count;
+        }
+
+
+        fieldElement fieldElementGCD(fieldElement u, fieldElement v) {
+            
+            if ((int)u.value.to_ulong() == 0) {
+                return v;
+            } else if ((int)v.value.to_ulong() == 0) {
+                return u;
+            }
+            // Rust implementation: https://en.wikipedia.org/wiki/Binary_GCD_algorithm
+            
+            /*
+                Important identities
+                1. gcd(0,v) = v
+                2. gcd(2u,2v) = 2gcd(u,v)
+                3. gcd(2u,v) = gcd(u,v) if v is odd
+                   gcd(u,2v) = gcd(u,v) if u is odd
+                4. gcd(u,v) = gcd(|u-v|, min(u, v)) if u and v are both odd
+            */ 
+            
+            int i = getTrailingZeros(u.value);
+            int j = getTrailingZeros(v.value);
+
+            u.value = u.value >> i;
+            v.value = v.value >> j;
+            int k = min(i,j);
+
+            while ((int)u.value.to_ulong() % 2 == 1 && (int)v.value.to_ulong() % 2 == 1) {
+                if (u.value > v.value) {
+                    // swap u and v so that u <= v
+                    fieldElement tmp = u;
+                    u = v;
+                    v = tmp;
+                }
+                v.value = v.value - u.value;
+                if ((int)v.value.to_ulong() == 0) {
+                    fieldElement returnVal(u.bitwidth, (int)(u.value << k).to_ulong(), (int)u.definingPolynomial.to_ulong());
+                    return returnVal;
+                }
+
+                v.value = v.value >> getTrailingZeros(v.value);
+            }
+
 
 
         }
@@ -268,15 +324,15 @@ int main() {
                                  // 10011 = 19
     GaloisField field(m, definingPolynomial);
 
-
-
     //field.polynomialStringToInt("x^2+2x+1");
 
     fieldElement element2 = field[11]; // x^2
     fieldElement element5 = field[4]; // x
     //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
 
-    cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
+    fieldElement poly(m, definingPolynomial, definingPolynomial);
+    cout << "gcd(" << element2.getValue() << "," << poly.getValue() <<") = " << element2.fieldElementGCD(element2, poly).getValue() << endl;
+    //cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
     /*
     for (int i=0; i<pow(2, m); i++){
         field.binaryToPolynomial(field[i].getValue());
