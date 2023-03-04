@@ -37,14 +37,14 @@ class fieldElement {
 
 
         fieldElement fieldElementGCD(fieldElement u, fieldElement v) {
-            
+
             if ((int)u.value.to_ulong() == 0) {
                 return v;
             } else if ((int)v.value.to_ulong() == 0) {
                 return u;
             }
             // Rust implementation: https://en.wikipedia.org/wiki/Binary_GCD_algorithm
-            
+
             /*
                 Important identities
                 1. gcd(0,v) = v
@@ -52,8 +52,8 @@ class fieldElement {
                 3. gcd(2u,v) = gcd(u,v) if v is odd
                    gcd(u,2v) = gcd(u,v) if u is odd
                 4. gcd(u,v) = gcd(|u-v|, min(u, v)) if u and v are both odd
-            */ 
-            
+            */
+
             int i = getTrailingZeros(u.value);
             int j = getTrailingZeros(v.value);
 
@@ -121,6 +121,7 @@ class fieldElement {
                 else
                     temp = (temp << 1);
             }
+            cout << value << "*" << input.value << "=" << product << endl;
             return product;
         }
 
@@ -318,31 +319,41 @@ public:
 
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
-    int m = 4; // input m for degree of field GaloisField(2^m)
-    //int definingPolynomial = 19;
-    int definingPolynomial = 19; // x^4+x+1
-                                 // 10011 = 19
+    int m; // input m for degree of field GaloisField(2^m)
+    int definingPolynomial; //input polynomial
+    int a,b;  //variables for field elements
+    char cont = 'y'; //variable to continue
+    char op;  //operation variable
+    cout << "Enter the given m for GF(2^m):";
+    cin >> m;
+    cout << "Enter the value of the given defining polynomial for GF(2^" << m << "):";
+    cin >> definingPolynomial;
     GaloisField field(m, definingPolynomial);
-
-    //field.polynomialStringToInt("x^2+2x+1");
-
-    fieldElement element2 = field[11]; // x^2
-    fieldElement element5 = field[4]; // x
-    //boost::dynamic_bitset<uint32_t> product = boost::dynamic_bitset<uint32_t>(4, );
-
-    fieldElement poly(m, definingPolynomial, definingPolynomial);
-    cout << "gcd(" << element2.getValue() << "," << poly.getValue() <<") = " << element2.fieldElementGCD(element2, poly).getValue() << endl;
-    //cout << element2.getValue() << "*" << element5.getValue() << "=" << element2 * element5 << endl;
-    /*
-    for (int i=0; i<pow(2, m); i++){
-        field.binaryToPolynomial(field[i].getValue());
+    while(cont == 'y' || cont == 'Y'){
+        cout << "Enter the first element of the field:";
+        cin >> a;
+        cout << "Enter the second element of the field:";
+        cin >> b;
+        fieldElement elementa = field[a];
+        fieldElement elementb = field[b];
+        cout << "Enter the operation to perform (+,-,*,/):";
+        cin >> op;
+        while(op != '+' && op != '-' && op != '*' && op != '/'){
+            cout << "Not a valid operator. Enter the operation to perform (+,-,*,/):";
+            cin >> op;
+        }
+        if(op == '+')
+            elementa + elementb;
+        else if(op == '-')
+            elementa - elementb;
+        else if(op == '*')
+            elementa * elementb;
+        //else(op == '/')
+            //elementa / elementb;
+        cout << "Compute another? :";
+        cin >> cont;
+        cin.ignore(256,'\n');
     }
-    */
-
-    // cout << field.getDegree() << endl;
-    // cout << field.getElementBitSize() << endl;
-    // field.printFieldValues();
-
-
+    cout << "Goodbye!\n";
     return 0;
 }
