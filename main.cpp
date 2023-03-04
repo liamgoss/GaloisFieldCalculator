@@ -20,29 +20,9 @@ class fieldElement {
         boost::dynamic_bitset <uint32_t> definingPolynomial;
     public:
 
-        vector<int> extendedEuclideanAlgo(int a, int b) {
-            // a*s + b*t = gcd(a,b)
-            int s0 = 1, t0 = 0, s1 = 0, t1 = 1;
-            int q, r;
+        boost::dynamic_bitset <uint32_t> extendedEuclideanAlgo() {
+            
 
-            while (b != 0) {
-                q = a / b;
-                r = a % b;
-
-                a = b;
-                b = r;
-
-                int temp_s = s0 - q * s1;
-                s0 = s1;
-                s1 = temp_s;
-
-                int temp_t = t0 - q * t1;
-                t0 = t1;
-                t1 = temp_t;
-            }
-            // gcd is a
-            vector<int> returnVals = {s0, t0};
-            return returnVals;
         }
 
         boost::dynamic_bitset <uint32_t> getValue () {
@@ -121,7 +101,7 @@ class fieldElement {
 class GaloisField {
 
 private:
-    int degree = 4; // m where GaloisField(2^m)
+    int degree = 3; // m where GaloisField(2^m)
     int elementBitSize = degree; // number of bits needed to represent the polynomial elements
     int polynomialVal = 19; // Defaults to defining polynomial of x^4+x+1 (10011)
     vector<fieldElement> elements; // vector to hold field elements
@@ -193,6 +173,9 @@ public:
     int getElementBitSize() {
         return elementBitSize;
     }
+    void setElementBitSize(int s) {
+        elementBitSize = s;
+    }
     int getPolynomialVal() {
         return polynomialVal;
     }
@@ -257,7 +240,8 @@ public:
      */
     GaloisField (int m, int poly) {
         // If custom polynomial is desired, this constructor will be executed
-        setDegree(m);
+        degree = m;
+        elementBitSize = m;
         polynomialVal = poly;
         defineFieldValues();
     }
@@ -279,9 +263,10 @@ int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
     int m = 3; // input m for degree of field GaloisField(2^m)
     //int definingPolynomial = 19;
-    int definingPolynomial = 19; // x^4+x+1
+    int definingPolynomial = 13; // x^4+x+1
                                  // 10011 = 19
     GaloisField field(m, definingPolynomial);
+    
 
 
     //field.polynomialStringToInt("x^2+2x+1");
