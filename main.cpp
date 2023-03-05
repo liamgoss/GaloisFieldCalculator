@@ -116,6 +116,7 @@ class fieldElement {
             // Step 5, place remainder from (4) into R1C2
             table[2][1] = table[0][1] % table[1][1];
 
+            // Repeat Steps 6-10 until RiC1 = 0
             int i = 2; 
             for (i; i<1000000; i++) {
                 // Step 6, add new line to table, increment i;
@@ -124,12 +125,16 @@ class fieldElement {
 
                 // Step 7, RiC2 is integer division (Ri-1)Ci/RiCi
                 table[i][2] = table[i-1][1] / table[i][2];
+                cout << table[i][2] << "=" << table[i-1][1] << "/" << table[i][2] << endl;
                 // Step 8, Place remainder from (7) into (Ri+1)C1
                 table[i+1][1] = table[i-1][1] % table[i][2];
+                cout << table[i+1][1] << "=" << table[i-1][1] << "%" << table[i][2] << endl;
                 // Step 9, RiC3 is (Ri-2)C3 - ((Ri-1)C2 * (Ri-1)C3)
                 table[i][3] = table[i-2][3] - (table[i-1][2] * table[i-1][3]);
+                cout << table[i][3] << "=" << table[i-2][3] << "-" << "(" << table[i-1][2] << "*" << table[i-1][3] << endl;
                 // Step 10, RiC4 is (Ri-2)C4 - ((Ri-1)C2 * (Ri-1)C4)
                 table[i][4] = table[i-2][4] - (table[i-1][2] * table[i-1][4]);
+                cout << table[i][4] << "=" << table[i-2][4] << "-" << "(" << table[i-1][2] << "*" << table[i-1][4] << endl;
                 // Repeat Steps 6-10 until RiC1 = 0
                 if (table[i][1] == 0) {
                     s = table[i-1][3];
@@ -138,6 +143,8 @@ class fieldElement {
                     break;
                 }
             }
+
+            // Print out table to terminal
             cout << "i r q s t" << endl;
             for (int j=0; j<table.size();j++) {
                 for (int k=0; k<5; k++) {
@@ -147,15 +154,6 @@ class fieldElement {
             }
             cout << endl;
             
-            
-
-
-            // table.size() = row count
-            // Column size should always stay static at 5
-
-            
-
-
 
             return vector<int> {s, t};
         }
@@ -407,6 +405,8 @@ public:
 
 };
 
+/*
+// Temporary Main to test functionality
 int main() {
     int m = 4;
     int definingPolynomial = 19;
@@ -420,9 +420,9 @@ int main() {
 
     element0.getBezoutCoefficients(element0, element1);
 }
+*/
 
 
-/*
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
     int m; // input m for degree of field GaloisField(2^m)
@@ -473,4 +473,3 @@ int main() {
     cout << "Goodbye!\n";
     return 0;
 }
-*/
