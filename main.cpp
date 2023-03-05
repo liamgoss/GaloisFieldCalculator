@@ -36,6 +36,7 @@ class fieldElement {
         }
 
 
+
         fieldElement fieldElementGCD(fieldElement u, fieldElement v) {
 
             if ((int)u.value.to_ulong() == 0) {
@@ -76,9 +77,87 @@ class fieldElement {
 
                 v.value = v.value >> getTrailingZeros(v.value);
             }
+        }
+
+        vector<int> getBezoutCoefficients(fieldElement aElem, fieldElement bElem) {
+            // a*s + b*t = gcd(a,b)
+            int gcd = (int)fieldElementGCD(aElem, bElem).getValue().to_ulong(); // Get GCD element converted to integer
+            int a = (int)aElem.getValue().to_ulong();
+            int b = (int)bElem.getValue().to_ulong();
+            int s, t;
+            // If b=definingPolynomial, the GCD should be 1, s will be the inverse of a
+            /*
+                10(ish) step process:
+                1.  Setup initial tables of 5 columns (iteration, remainder, quotient, s, t)
+                2.  Insert numerator into R0C1
+                3.  Insert denominator into R1C1
+                4.  Integer divide R0C1 by R1C1 and place result into R1C2
+                5.  Place remainder from (4) into R2C1
+                6.  Add new row to table, increment i (i is not the new row, it is *now* the one before the new row)
+                7.  RiC2 is integer division (Ri-1)Ci/RiCi
+                8.  Place remainder from (7) into (Ri+1)C1
+                9.  RiC3 is (Ri-2)C3 - ((Ri-1)C2 * (Ri-1)C3)
+                10. RiC4 is (Ri-2)C4 - ((Ri-1)C2 * (Ri-1)C4)
+                Repeat steps 6-10 until RiC1 = 0
+            */
+            // Step 1, create initial table
+            vector<vector<int>> table = {
+                //i, r, q, s, t
+                 {0, -1, -1, 1, 0}, // R0
+                 {1, -1, -1, 0, 1}, // R1
+                 {2, -1, -1, -1, -1}, // R2
+            };
+            // Step 2, Insert numerator into R0C1
+            table[0][1] = a;
+            // Step 3, insert denominator into R1C1
+            table[1][1] = b;
+            // Step 4, integer divide R0C1 by R1C1, place result into R1C2
+            table[1][2] = table[0][1] / table[1][1];
+            // Step 5, place remainder from (4) into R1C2
+            table[2][1] = table[0][1] % table[1][1];
+
+            int i = 2; 
+            for (i; i<1000000; i++) {
+                // Step 6, add new line to table, increment i;
+                vector<int> tmpVect = {i+1, -1, -1, -1, -1};
+                table.insert(table.begin() + table.size(), tmpVect);
+
+                // Step 7, RiC2 is integer division (Ri-1)Ci/RiCi
+                table[i][2] = table[i-1][1] / table[i][2];
+                // Step 8, Place remainder from (7) into (Ri+1)C1
+                table[i+1][1] = table[i-1][1] % table[i][2];
+                // Step 9, RiC3 is (Ri-2)C3 - ((Ri-1)C2 * (Ri-1)C3)
+                table[i][3] = table[i-2][3] - (table[i-1][2] * table[i-1][3]);
+                // Step 10, RiC4 is (Ri-2)C4 - ((Ri-1)C2 * (Ri-1)C4)
+                table[i][4] = table[i-2][4] - (table[i-1][2] * table[i-1][4]);
+                // Repeat Steps 6-10 until RiC1 = 0
+                if (table[i][1] == 0) {
+                    s = table[i-1][3];
+                    t = table[i-1][4];
+                    cout << a << "(" << s  << ") + " << b << "(" << t << ") = " << gcd << endl;
+                    break;
+                }
+            }
+            cout << "i r q s t" << endl;
+            for (int j=0; j<table.size();j++) {
+                for (int k=0; k<5; k++) {
+                    cout << table[j][k] << " ";
+                }
+                cout << endl;
+            }
+            cout << endl;
+            
+            
+
+
+            // table.size() = row count
+            // Column size should always stay static at 5
+
+            
 
 
 
+            return vector<int> {s, t};
         }
 
         boost::dynamic_bitset <uint32_t> getValue () {
@@ -328,9 +407,22 @@ public:
 
 };
 
+int main() {
+    int m = 4;
+    int definingPolynomial = 19;
+    GaloisField field(4, 19);
+
+    fieldElement element0 = field[4];
+    fieldElement element1 = field[5];
+
+    //cout << element0.getValue() << endl;
+    //cout << element1.getValue() << endl;
+
+    element0.getBezoutCoefficients(element0, element1);
+}
 
 
-
+/*
 int main() {
     // GaloisField(2^4) defined by p(x) = x^4 + x + 1; p(x)=10011 which is 19
     int m; // input m for degree of field GaloisField(2^m)
@@ -381,3 +473,4 @@ int main() {
     cout << "Goodbye!\n";
     return 0;
 }
+*/
